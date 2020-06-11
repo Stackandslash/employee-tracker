@@ -21,9 +21,12 @@ CREATE TABLE role (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE department (
+CREATE TABLE employee (
   id INT NOT NULL AUTO_INCREMENT,
-  name varchar(50) NOT NULL,
+  first_name varchar(30) NOT NULL,
+  last_name varchar(30) NOT NULL,
+  role_id INT NOT NULL,
+  manager_id INT,
   PRIMARY KEY (id)
 );
 
