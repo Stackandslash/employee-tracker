@@ -193,7 +193,6 @@ function addRole() {
           if (err) {
            throw err;
           }
-  
           //Prompt and loop back to the main menu.
           console.log("Role added!");
           startPrompts();
@@ -204,21 +203,91 @@ function addRole() {
   })
 }
 
+//the array fill is taking too long here, so async it is.
 function addEmployee() {
   console.log("Adding employee...");
   
+  //Get the roles available for the list.
+  let roleList = []; //Set up array of current roles.
+  connection.query("SELECT title FROM role", function(err, res) {
+    if (err) throw err;
+    // Push the results into the array
+    for (let i = 0; i < res.length; i++) {
+       roleList.push(res[i].title);
+    }
+  });
+
+  //Get the employees available for the list.
+  let employeeList = []; //Set up array of current roles.
+  
+  connection.query("SELECT first_name, last_name FROM employee", function(err, res) {
+    if (err) throw err;
+    // Push the results into the array
+    for (let i = 0; i < res.length; i++) {
+       employeeList.push(res[i].first_name + " " + res[i].last_name);
+    }
+  });
+  //console.log(roleList, employeeList);
+  //Inquierer prompt for input again, but this time, we're splitting it into two inquirer prompts, in order to provide the small delay needed to fill the list variables, since they don't fill in time normally.
+  //This would probably be a lot easier with some kind of join-based deal I haven't picked up on yet. Too bad I missed that. Stay in school, kids.
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "First name?",
+        name: "firstname"
+      },
+      {
+        type: "input",
+        message: "Last name?",
+        name: "lastname"
+      }
+    ])
+    .then((response) => {
+      //const employeeName = response.firstname + " " + response.lastname;
+      //console.log(employeeName);
+      const inputFirstName = response.firstname;
+      const inputLastName = response.lastname;
+      inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Role?",
+        name: "role",
+        //choices: roleList
+        choices: roleList
+      },
+      {
+        type: "list",
+        message: "Manager?",
+        name: "manager",
+        //choices: employeeList
+        choices: employeeList
+      }
+    ])
+    .then((response) => {
+      //This is where we start getting the IDs
+      connection.query("SELECT id FROM role WHERE title = ?", response.role , function(err, res) {
+        if (err) throw err;
+        let roleId = res[0].id;
+        let resplitName = response.manager.split(" ");
+        //IF statement goes here - if the manager option picked is None, do an INSERT without the id.
+      connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", (resplitName) , function(err, res) {
+        if (err) throw err;
+        let managerId = res[0].id;
+
+        // This is where we punch in the data into the table.
+        
+        connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [inputFirstName, inputLastName, roleId, managerId], function(err, result) {
+          if (err) {
+            throw err;
+          }
+          //Prompt and loop back to the main menu.
+          console.log("Employee added!");
+          startPrompts();
+        });
+      });
+    });
+  });
+});
 }
-
-
-// let idPrompt = 
-// {
-//   type: "input",
-//   message: "ID?",
-//   name: "id"
-// };
-// let emailPrompt = 
-// {
-//   type: "input",
-//   message: "Work email?",
-//   name: "email"
-// };
