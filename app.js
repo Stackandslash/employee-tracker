@@ -226,6 +226,7 @@ function addEmployee() {
     for (let i = 0; i < res.length; i++) {
        employeeList.push(res[i].first_name + " " + res[i].last_name);
     }
+    employeeList.push("None"); //This ensures we can have top-level employees added without a manager.
   });
   //console.log(roleList, employeeList);
   //Inquierer prompt for input again, but this time, we're splitting it into two inquirer prompts, in order to provide the small delay needed to fill the list variables, since they don't fill in time normally.
@@ -270,8 +271,18 @@ function addEmployee() {
       connection.query("SELECT id FROM role WHERE title = ?", response.role , function(err, res) {
         if (err) throw err;
         let roleId = res[0].id;
-        let resplitName = response.manager.split(" ");
         //IF statement goes here - if the manager option picked is None, do an INSERT without the id.
+        if(response.manager === "None"){
+          connection.query("INSERT INTO employee (first_name, last_name, role_id) VALUES (?, ?, ?)", [inputFirstName, inputLastName, roleId], function(err, result) {
+            if (err) {
+              throw err;
+            }
+            //Prompt and loop back to the main menu.
+            console.log("Employee added!");
+            startPrompts();
+        })}
+        else{
+        let resplitName = response.manager.split(" ");
       connection.query("SELECT id FROM employee WHERE first_name = ? AND last_name = ?", (resplitName) , function(err, res) {
         if (err) throw err;
         let managerId = res[0].id;
@@ -286,7 +297,7 @@ function addEmployee() {
           console.log("Employee added!");
           startPrompts();
         });
-      });
+      });}
     });
   });
 });
