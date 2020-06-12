@@ -24,8 +24,7 @@ function startPrompts() {
     .prompt([
       {
         type: "list",
-        message:
-          "What would you like to do?",
+        message: "What would you like to do?",
         name: "start",
         choices: ["Add", "Update", "View", "Exit"],
       },
@@ -39,8 +38,8 @@ function startPrompts() {
           updateRole();
           break;
         case "View":
-            viewSelect();
-            break;
+          viewSelect();
+          break;
         default:
           console.log("Bye!");
           break;
@@ -48,81 +47,91 @@ function startPrompts() {
     });
 }
 
-
-function viewSelect(){
-    console.log("View which category?");
-    inquirer
+function viewSelect() {
+  console.log("View which category?");
+  inquirer
     .prompt([
-        {
+      {
         type: "list",
-        message:
-          "What category do you want to view?",
-          name: "viewPick",
+        message: "What category do you want to view?",
+        name: "viewPick",
         choices: ["Departments", "Roles", "Employees"],
       },
     ])
     .then((response) => {
-        switch (response.viewPick) {
+      switch (response.viewPick) {
         case "Departments":
-            console.log("viewing Departments...");
+          console.log("viewing Departments...");
+          connection.query("SELECT * FROM department", function(err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.table(res);
+          });
           break;
         case "Roles":
-            console.log("viewing Roles...");
-        break;
+          console.log("viewing Roles...");
+          connection.query("SELECT * FROM role", function(err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.table(res);
+        });
+          break;
         case "Employees":
-            console.log("viewing Employees...");
-        break;
+          console.log("viewing Employees...");
+          connection.query("SELECT * FROM employee", function(err, res) {
+            if (err) throw err;
+            // Log all results of the SELECT statement
+            console.table(res);
+        });
+          break;
         default:
-            console.log("Broke!");
-        break;
-                }
-            });
-        }
-        
-
-function updateRole(){
-    console.log("Update who?");
-}
-        
-
-function addSelect(){
-    console.log("Adding an entry...");
-    inquirer
-    .prompt([
-        {
-        type: "list",
-        message:
-        "What would you like to add?",
-        name: "addPick",
-        choices: ["Department", "Role", "Employee"],
-    },
-])
-.then((response) => {
-    switch (response.addPick) {
-        case "Department":
-            addDepartment();
-            break;
-            case "Role":
-                addRole();
-                break;
-                case "Employee":
-                    addEmployee();
-                    break;
-        default:
-            console.log("Broke!");
-            break;
-        }
+          console.log("Broke!");
+          break;
+      }
     });
 }
 
-function addDepartment(){
-    console.log("Adding department...");
+function updateRole() {
+  console.log("Update who?");
 }
 
-function addRole(){
-    console.log("Adding role...");
+function addSelect() {
+  console.log("Adding an entry...");
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "What would you like to add?",
+        name: "addPick",
+        choices: ["Department", "Role", "Employee"],
+      },
+    ])
+    .then((response) => {
+      switch (response.addPick) {
+        case "Department":
+          addDepartment();
+          break;
+        case "Role":
+          addRole();
+          break;
+        case "Employee":
+          addEmployee();
+          break;
+        default:
+          console.log("Broke!");
+          break;
+      }
+    });
 }
 
-function addEmployee(){
-    console.log("Adding employee...");
+function addDepartment() {
+  console.log("Adding department...");
+}
+
+function addRole() {
+  console.log("Adding role...");
+}
+
+function addEmployee() {
+  console.log("Adding employee...");
 }
