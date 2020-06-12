@@ -126,12 +126,99 @@ function addSelect() {
 
 function addDepartment() {
   console.log("Adding department...");
+  //Inquierer prompt for input
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Department name?",
+        name: "depname"
+      }
+    ])
+    //promise follow-through
+    .then((response) => {
+      //Insert entered info into the table in question.
+      connection.query("INSERT INTO department (name) VALUES (?)", response.depname, function(err, result) {
+        if (err) {
+         throw err;
+        }
+        //Prompt and loop back to the main menu.
+        console.log("Department added!");
+        startPrompts();
+      });
+    })
 }
 
 function addRole() {
   console.log("Adding role...");
+  //Get the Departments available for the list.
+  let departmentList = []; //Set up array of departments for final question.
+  connection.query("SELECT name FROM department", function(err, res) {
+    if (err) throw err;
+    // Push the results into the array
+    for (let i = 0; i < res.length; i++) {
+       departmentList.push(res[i].name);
+    }
+  });
+  
+  //Inquierer prompt for input
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        message: "Role title?",
+        name: "roleTitle"
+      },
+      {
+        type: "number",
+        message: "Salary?",
+        name: "roleSalary"
+      },
+      {
+        type: "list",
+        message: "Department?",
+        name: "roleDepartment",
+        choices: departmentList
+      },
+    ])
+    //promise follow-through
+    .then((response) => {
+      let roleId
+      connection.query("SELECT id FROM department WHERE name = ?", response.roleDepartment , function(err, res) {
+        if (err) throw err;
+        roleId = res[0].id;
+        console.log(response.roleTitle, response.roleSalary, roleId);
+        //Insert entered info into the table in question.
+         connection.query("INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)", [response.roleTitle, response.roleSalary, roleId], function(err, result) {
+          if (err) {
+           throw err;
+          }
+  
+          //Prompt and loop back to the main menu.
+          console.log("Role added!");
+          startPrompts();
+      });
+      
+      
+      });
+  })
 }
 
 function addEmployee() {
   console.log("Adding employee...");
+  
 }
+
+
+// let idPrompt = 
+// {
+//   type: "input",
+//   message: "ID?",
+//   name: "id"
+// };
+// let emailPrompt = 
+// {
+//   type: "input",
+//   message: "Work email?",
+//   name: "email"
+// };
