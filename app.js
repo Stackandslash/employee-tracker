@@ -149,8 +149,8 @@ function updateRole() {
               let roleId = res[0].id;
               //This is where we assign the change itself. We're using the first and last name here because, to be blunt, this display has no appreciable way to differentiate between identically-named employees except for the ID.
               //And just having them put the ID in themselves is cheating.
-              connection.query("UPDATE employee SET role_id = ? WHERE employee_Id = ?", [roleId, employeeId], function(err,res){
-                console.log("Role Updated!");
+              connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [roleId, employeeId], function(err,res){
+                console.log("Role Updated!", roleId, employeeId);
                 startPrompts();
               })
             });
